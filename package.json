@@ -1,0 +1,12 @@
+{
+	"name": "egret",
+	"version": "2.5.4",
+	"modules": [
+		{
+			"name": "robotlegs_egret",
+			"description": "robotlegs_egret",
+			"files": [],
+			"root": "src"
+		}
+	]
+}
