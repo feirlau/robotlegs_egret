@@ -1103,6 +1103,7 @@ var fl;
         }
         return MappingConfig;
     })(egret.HashObject);
+    fl.MappingConfig = MappingConfig;
 })(fl || (fl = {}));
 var fl;
 (function (fl) {
@@ -1659,3 +1660,4 @@ var fl;
 (function (fl) {
     fl.IViewMap = "fl.IViewMap";
 })(fl || (fl = {}));
+//# sourceMappingURL=robotlegs_egret.js.map

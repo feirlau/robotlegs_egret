@@ -219,7 +219,7 @@ module fl {
 
 	}
 
-	 class MappingConfig extends egret.HashObject {
+	 export class MappingConfig extends egret.HashObject {
 
 		public mediatorClass:any;
 		public typedViewClasses:Array<any>;
