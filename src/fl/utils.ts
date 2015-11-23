@@ -5,8 +5,8 @@ module fl {
     export function isNumber(value:any):boolean {
         var type:string = (typeof value);
         if(type === "object") {
-            type = egret.getQualifiedClassName(value);
-            return type === "Number";
+            type = Object.prototype.toString.call(value);;
+            return type === "[object Number]";
         } else {
             return type === "number";
         }
@@ -14,8 +14,8 @@ module fl {
     export function isString(value:any):boolean {
         var type:string = (typeof value);
         if(type === "object") {
-            type = egret.getQualifiedClassName(value);
-            return type === "String";
+            type = Object.prototype.toString.call(value);;
+            return type === "[object String]";
         } else {
             return type === "string";
         }
@@ -36,23 +36,19 @@ module fl {
         if(value === superValue) return true;
         if(!value  || !superValue) return false;
 
-        var proto:any;
-        var type1:string = (typeof value);
-        if(type1 === "object") {
-            types = Object.getPrototypeOf(value);
+        var types:Array<string>;
+        if(isString(value)) {
+            types = [value];
         } else {
-            proto = value.prototype;
+            var proto:any = value.prototype ? value.prototype : Object.getPrototypeOf(value);
+            types = proto ? proto.__types__ : null;
+            if (!types) {
+                return false;
+            }
         }
 
-        var type2:string = (typeof superValue);
-        if(type2 !== "string") {
-            superValue = egret.getQualifiedClassName(superValue);
-        }
+        superValue = getClassName(superValue);
 
-        var types:Array<string> = proto ? proto.__types__ : null;
-        if (!types) {
-            return false;
-        }
         return (types.indexOf(superValue) !== -1);
     }
     export function getClassName(value:any,replaceColons:boolean = false):string
@@ -331,5 +327,5 @@ module fl {
 }
 
 fl.LINE_BREAKS = new RegExp("[\r\n]+","img");
-fl.COLOR_TEXT = "<font {0} {1} {2}>{3}</font>";
+fl.COLOR_TEXT = "\<font {0} {1} {2}\>{3}\</font\>";
 fl.HTML_TAG = /<[^>]+>/g;

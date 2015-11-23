@@ -4,7 +4,7 @@
 	"modules": [
 		{
 			"name": "robotlegs_egret",
-			"description": "robotlegs_egret",
+			"description": "robotlegs for egret",
 			"files": [],
 			"root": "src"
 		}
