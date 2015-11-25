@@ -6,8 +6,9 @@ var fl;
     function isNumber(value) {
         var type = (typeof value);
         if (type === "object") {
-            type = egret.getQualifiedClassName(value);
-            return type === "Number";
+            type = Object.prototype.toString.call(value);
+            ;
+            return type === "[object Number]";
         }
         else {
             return type === "number";
@@ -17,8 +18,9 @@ var fl;
     function isString(value) {
         var type = (typeof value);
         if (type === "object") {
-            type = egret.getQualifiedClassName(value);
-            return type === "String";
+            type = Object.prototype.toString.call(value);
+            ;
+            return type === "[object String]";
         }
         else {
             return type === "string";
@@ -47,22 +49,18 @@ var fl;
             return true;
         if (!value || !superValue)
             return false;
-        var proto;
-        var type1 = (typeof value);
-        if (type1 === "object") {
-            types = Object.getPrototypeOf(value);
+        var types;
+        if (isString(value)) {
+            types = [value];
         }
         else {
-            proto = value.prototype;
+            var proto = value.prototype ? value.prototype : Object.getPrototypeOf(value);
+            types = proto ? proto.__types__ : null;
+            if (!types) {
+                return false;
+            }
         }
-        var type2 = (typeof superValue);
-        if (type2 !== "string") {
-            superValue = egret.getQualifiedClassName(superValue);
-        }
-        var types = proto ? proto.__types__ : null;
-        if (!types) {
-            return false;
-        }
+        superValue = getClassName(superValue);
         return (types.indexOf(superValue) !== -1);
     }
     fl.is = is;
@@ -304,7 +302,7 @@ var fl;
     fl.getColor = getColor;
 })(fl || (fl = {}));
 fl.LINE_BREAKS = new RegExp("[\r\n]+", "img");
-fl.COLOR_TEXT = "<font {0} {1} {2}>{3}</font>";
+fl.COLOR_TEXT = "\<font {0} {1} {2}\>{3}\</font\>";
 fl.HTML_TAG = /<[^>]+>/g;
 /**
  * Created by huitao on 2015/6/25.

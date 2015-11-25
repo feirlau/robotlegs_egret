@@ -2,9 +2,13 @@
     "compilerOptions": {
         "module": "commonjs",
         "target": "ES5",
+        "outDir": "bin",
         "outFile": "bin/robotlegs_egret.js",
         "rootDir": "src",
         "sourceMap": true,
         "declaration": true
-    }
+    },
+     "exclude": [
+        "bin"
+     ]
 }
