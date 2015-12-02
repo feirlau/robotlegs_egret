@@ -8,12 +8,14 @@ module fl {
 		protected verifiedCommandClasses:fl.Dictionary;
 		protected detainedCommands:fl.Dictionary;
 
-		public constructor(eventDispatcher:egret.IEventDispatcher,injector:fl.IInjector,reflector:fl.IReflector)
+		public context:fl.IContext;
+		public constructor(context:fl.IContext)
 		{
 			super();
-			this.eventDispatcher = eventDispatcher;
-			this.injector = injector;
-			this.reflector = reflector;
+			this.context = context;
+			this.eventDispatcher = context.eventDispatcher;
+			this.injector = context.createChildInjector();
+			this.reflector = context.reflector;
 			this.eventTypeMap = new fl.Dictionary(false);
 			this.verifiedCommandClasses = new fl.Dictionary(false);
 			this.detainedCommands = new fl.Dictionary(false);

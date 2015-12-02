@@ -3,12 +3,26 @@ module fl {
 		public static  UIComponentClass:string;
 		protected viewComponent:any;
 		protected removed:boolean = false;
-
+		protected _context:fl.IContext;
 		public constructor()
 		{
 			super();
 		}
 
+		public get context():fl.IContext
+		{
+			return this._context;
+		}
+
+		public set context(value:fl.IContext)
+		{
+			this._context = value;
+			this.updateContext();
+		}
+		protected updateContext()
+		{
+		}
+		
 		public preRegister()
 		{
 			this.removed = false;

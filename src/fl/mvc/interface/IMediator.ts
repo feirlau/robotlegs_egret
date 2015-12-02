@@ -6,6 +6,8 @@ module fl {
 		onRemove();
 		getViewComponent():any;
 		setViewComponent(viewComponent:any);
+		
+		context:fl.IContext;
 	}
 	export var IMediator:string = "fl.IMediator";
 }

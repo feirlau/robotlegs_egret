@@ -6,13 +6,14 @@ module fl {
 		protected injector:fl.IInjector;
 		protected useCapture:boolean = false;
 		protected viewListenerCount:number = 0;
-
-		public constructor(contextView:egret.DisplayObjectContainer,injector:fl.IInjector)
+		public context:fl.IContext;
+		public constructor(context:fl.IContext)
 		{
 			super();
-			this.injector = injector;
+			this.context = context;
+			this.injector = context.injector;
 			this.useCapture = true;
-			this.contextView = contextView;
+			this.contextView = context.contextView;
 		}
 
 		public get contextView():egret.DisplayObjectContainer

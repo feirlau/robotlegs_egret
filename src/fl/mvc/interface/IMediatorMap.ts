@@ -10,6 +10,8 @@ module fl {
 		hasMapping(viewClassOrName:any):boolean;
 		hasMediator(mediator:fl.IMediator):boolean;
 		hasMediatorForView(viewComponent:any):boolean;
+		
+		context:fl.IContext;
 		contextView:egret.DisplayObjectContainer;
 		enabled:boolean;
 	}

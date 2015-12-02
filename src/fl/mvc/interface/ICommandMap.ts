@@ -1,6 +1,7 @@
 module fl {
 	export interface ICommandMap {
-
+		context:fl.IContext;
+		
 		detain(command:any);
 		release(command:any);
 		execute(commandClass:any,payload?:any,payloadClass?:any,named?:string);

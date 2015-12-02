@@ -5,9 +5,9 @@ module fl {
 		protected mappedTypes:fl.Dictionary;
 		protected injectedViews:fl.Dictionary;
 
-		public constructor(contextView:egret.DisplayObjectContainer,injector:fl.IInjector)
+		public constructor(context:fl.IContext)
 		{
-			super(contextView,injector);
+			super(context);
 			this.mappedPackages = new Array();
 			this.mappedTypes = new fl.Dictionary(false);
 			this.injectedViews = new fl.Dictionary(true);

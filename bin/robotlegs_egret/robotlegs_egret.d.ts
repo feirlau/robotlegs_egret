@@ -54,6 +54,7 @@ declare module fl {
 }
 declare module fl {
     interface ICommandMap {
+        context: fl.IContext;
         detain(command: any): any;
         release(command: any): any;
         execute(commandClass: any, payload?: any, payloadClass?: any, named?: string): any;
@@ -67,6 +68,13 @@ declare module fl {
 declare module fl {
     interface IContext {
         eventDispatcher: egret.IEventDispatcher;
+        injector: fl.IInjector;
+        reflector: fl.IReflector;
+        contextView: egret.DisplayObjectContainer;
+        commandMap: fl.ICommandMap;
+        mediatorMap: fl.IMediatorMap;
+        viewMap: fl.IViewMap;
+        createChildInjector(): fl.IInjector;
     }
     var IContext: string;
 }
@@ -108,6 +116,7 @@ declare module fl {
         onRemove(): any;
         getViewComponent(): any;
         setViewComponent(viewComponent: any): any;
+        context: fl.IContext;
     }
     var IMediator: string;
 }
@@ -123,6 +132,7 @@ declare module fl {
         hasMapping(viewClassOrName: any): boolean;
         hasMediator(mediator: fl.IMediator): boolean;
         hasMediatorForView(viewComponent: any): boolean;
+        context: fl.IContext;
         contextView: egret.DisplayObjectContainer;
         enabled: boolean;
     }
@@ -144,6 +154,7 @@ declare module fl {
         mapType(type: any): any;
         unmapType(type: any): any;
         hasType(type: any): boolean;
+        context: fl.IContext;
         contextView: egret.DisplayObjectContainer;
         enabled: boolean;
     }
@@ -268,7 +279,8 @@ declare module fl {
         protected eventTypeMap: fl.Dictionary;
         protected verifiedCommandClasses: fl.Dictionary;
         protected detainedCommands: fl.Dictionary;
-        constructor(eventDispatcher: egret.IEventDispatcher, injector: fl.IInjector, reflector: fl.IReflector);
+        context: fl.IContext;
+        constructor(context: fl.IContext);
         mapEvent(eventType: string, commandClass: any, eventClass?: any, oneshot?: boolean): void;
         unmapEvent(eventType: string, commandClass: any, eventClass?: any): void;
         unmapEvents(): void;
@@ -283,7 +295,22 @@ declare module fl {
 declare module fl {
     class ContextBase extends egret.HashObject implements fl.IContext, egret.IEventDispatcher {
         protected _eventDispatcher: egret.IEventDispatcher;
+        protected _injector: fl.IInjector;
+        protected _reflector: fl.IReflector;
+        protected _contextView: egret.DisplayObjectContainer;
+        protected _commandMap: fl.ICommandMap;
+        protected _mediatorMap: fl.IMediatorMap;
+        protected _viewMap: fl.IViewMap;
         constructor();
+        contextView: egret.DisplayObjectContainer;
+        injector: fl.IInjector;
+        protected createInjector(): fl.IInjector;
+        createChildInjector(): fl.IInjector;
+        reflector: fl.IReflector;
+        protected createReflector(): fl.IReflector;
+        commandMap: fl.ICommandMap;
+        mediatorMap: fl.IMediatorMap;
+        viewMap: fl.IViewMap;
         protected createEventDispatcher(): egret.IEventDispatcher;
         eventDispatcher: egret.IEventDispatcher;
         once(type: string, listener: Function, thisObject: any, useCapture?: boolean, priority?: number): void;
@@ -339,7 +366,10 @@ declare module fl {
         static UIComponentClass: string;
         protected viewComponent: any;
         protected removed: boolean;
+        protected _context: fl.IContext;
         constructor();
+        context: fl.IContext;
+        protected updateContext(): void;
         preRegister(): void;
         onRegister(): void;
         preRemove(): void;
@@ -356,7 +386,8 @@ declare module fl {
         protected injector: fl.IInjector;
         protected useCapture: boolean;
         protected viewListenerCount: number;
-        constructor(contextView: egret.DisplayObjectContainer, injector: fl.IInjector);
+        context: fl.IContext;
+        constructor(context: fl.IContext);
         contextView: egret.DisplayObjectContainer;
         enabled: boolean;
         protected addListeners(): void;
@@ -372,7 +403,7 @@ declare module fl {
         protected mediatorsMarkedForRemoval: fl.Dictionary;
         protected hasMediatorsMarkedForRemoval: boolean;
         protected reflector: fl.IReflector;
-        constructor(contextView: egret.DisplayObjectContainer, injector: fl.IInjector, reflector: fl.IReflector);
+        constructor(context: fl.IContext);
         mapView(viewClassOrName: any, mediatorClass: any, injectViewAs?: any, autoCreate?: boolean, autoRemove?: boolean): void;
         unmapView(viewClassOrName: any): void;
         createMediator(viewComponent: any): fl.IMediator;
@@ -402,7 +433,7 @@ declare module fl {
         protected mappedPackages: Array<any>;
         protected mappedTypes: fl.Dictionary;
         protected injectedViews: fl.Dictionary;
-        constructor(contextView: egret.DisplayObjectContainer, injector: fl.IInjector);
+        constructor(context: fl.IContext);
         mapPackage(packageName: string): void;
         unmapPackage(packageName: string): void;
         mapType(type: any): void;
@@ -427,11 +458,8 @@ declare module fl {
 }
 declare module fl {
     class Command extends egret.HashObject {
-        contextView: egret.DisplayObjectContainer;
-        commandMap: fl.ICommandMap;
-        eventDispatcher: any;
-        injector: fl.IInjector;
-        mediatorMap: fl.IMediatorMap;
+        context: fl.IContext;
+        eventDispatcher: egret.IEventDispatcher;
         constructor();
         execute(): void;
         protected dispatch(event: egret.Event): boolean;
@@ -439,10 +467,7 @@ declare module fl {
 }
 declare module fl {
     class Context extends fl.ContextBase implements fl.IContext {
-        protected _injector: fl.IInjector;
-        protected _reflector: fl.IReflector;
         protected _autoStartup: boolean;
-        protected _contextView: egret.DisplayObjectContainer;
         protected _commandMap: fl.ICommandMap;
         protected _mediatorMap: fl.IMediatorMap;
         protected _viewMap: fl.IViewMap;
@@ -450,25 +475,22 @@ declare module fl {
         startup(): void;
         shutdown(): void;
         contextView: egret.DisplayObjectContainer;
-        protected injector: fl.IInjector;
-        protected reflector: fl.IReflector;
-        protected commandMap: fl.ICommandMap;
-        protected mediatorMap: fl.IMediatorMap;
-        protected viewMap: fl.IViewMap;
+        commandMap: fl.ICommandMap;
+        mediatorMap: fl.IMediatorMap;
+        viewMap: fl.IViewMap;
         protected mapInjections(): void;
         protected checkAutoStartup(): void;
         protected onAddedToStage(e: egret.Event): void;
         protected createInjector(): fl.IInjector;
-        protected createChildInjector(): fl.IInjector;
+        protected createReflector(): fl.IReflector;
     }
 }
 declare module fl {
     class Mediator extends fl.MediatorBase {
-        contextView: egret.DisplayObjectContainer;
-        mediatorMap: fl.IMediatorMap;
         protected _eventDispatcher: egret.IEventDispatcher;
         protected _eventMap: fl.IEventMap;
         constructor();
+        protected updateContext(): void;
         preRemove(): void;
         eventDispatcher: egret.IEventDispatcher;
         protected eventMap: fl.IEventMap;

@@ -1,11 +1,8 @@
 module fl {
 	export class Command extends egret.HashObject {
 
-		public contextView:egret.DisplayObjectContainer;
-		public commandMap:fl.ICommandMap;
-		public eventDispatcher:any;
-		public injector:fl.IInjector;
-		public mediatorMap:fl.IMediatorMap;
+		public context:fl.IContext;
+		public eventDispatcher:egret.IEventDispatcher;
 
 		public constructor()
 		{

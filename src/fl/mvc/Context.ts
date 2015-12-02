@@ -1,10 +1,6 @@
 module fl {
 	export class Context extends fl.ContextBase implements fl.IContext {
-
-		protected _injector:fl.IInjector;
-		protected _reflector:fl.IReflector;
 		protected _autoStartup:boolean = false;
-		protected _contextView:egret.DisplayObjectContainer;
 		protected _commandMap:fl.ICommandMap;
 		protected _mediatorMap:fl.IMediatorMap;
 		protected _viewMap:fl.IViewMap;
@@ -31,11 +27,6 @@ module fl {
 			this.dispatchEvent(new fl.ContextEvent(fl.ContextEvent.SHUTDOWN_COMPLETE));
 		}
 
-		public get contextView():egret.DisplayObjectContainer
-		{
-			return this._contextView;
-		}
-
 		public set contextView(value:egret.DisplayObjectContainer)
 		{
 			if(value == this._contextView)
@@ -47,54 +38,19 @@ module fl {
 			this.checkAutoStartup();
 		}
 
-		protected get injector():fl.IInjector
+		public get commandMap():fl.ICommandMap
 		{
-			return this._injector = this._injector || this.createInjector();
+			return this._commandMap = this._commandMap || new fl.CommandMap(this);
 		}
 
-		protected set injector(value:fl.IInjector)
+		public get mediatorMap():fl.IMediatorMap
 		{
-			this._injector = value;
+			return this._mediatorMap = this._mediatorMap || new fl.MediatorMap(this);
 		}
 
-		protected get reflector():fl.IReflector
+		public get viewMap():fl.IViewMap
 		{
-			return this._reflector = this._reflector || new fl.Reflector();
-		}
-
-		protected set reflector(value:fl.IReflector)
-		{
-			this._reflector = value;
-		}
-
-		protected get commandMap():fl.ICommandMap
-		{
-			return this._commandMap = this._commandMap || new fl.CommandMap(this.eventDispatcher,this.createChildInjector(),this.reflector);
-		}
-
-		protected set commandMap(value:fl.ICommandMap)
-		{
-			this._commandMap = value;
-		}
-
-		protected get mediatorMap():fl.IMediatorMap
-		{
-			return this._mediatorMap = this._mediatorMap || new MediatorMap(this.contextView,this.createChildInjector(),this.reflector);
-		}
-
-		protected set mediatorMap(value:fl.IMediatorMap)
-		{
-			this._mediatorMap = value;
-		}
-
-		protected get viewMap():fl.IViewMap
-		{
-			return this._viewMap = this._viewMap || new ViewMap(this.contextView,this.injector);
-		}
-
-		protected set viewMap(value:fl.IViewMap)
-		{
-			this._viewMap = value;
+			return this._viewMap = this._viewMap || new ViewMap(this);
 		}
 
 		protected mapInjections()
@@ -128,10 +84,10 @@ module fl {
 			var injector:fl.IInjector = new fl.Injector();
 			return injector;
 		}
-
-		protected createChildInjector():fl.IInjector
+		protected createReflector():fl.IReflector
 		{
-			return this.injector.createChildInjector();
+			var reflector:fl.IReflector = new fl.Reflector();
+			return reflector;
 		}
 	}
 }

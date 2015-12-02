@@ -8,10 +8,10 @@ module fl {
 		protected hasMediatorsMarkedForRemoval:boolean = false;
 		protected reflector:fl.IReflector;
 
-		public constructor(contextView:egret.DisplayObjectContainer,injector:fl.IInjector,reflector:fl.IReflector)
+		public constructor(context:fl.IContext)
 		{
-			super(contextView,injector);
-			this.reflector = reflector;
+			super(context);
+			this.reflector = context.reflector;
 			this.mediatorByView = new fl.Dictionary(true);
 			this.mappingConfigByView = new fl.Dictionary(true);
 			this.mappingConfigByViewClassName = new fl.Dictionary(false);
@@ -177,6 +177,7 @@ module fl {
 						this.injector.mapValue(claxx,viewComponent);
 					}
 					mediator = this.injector.instantiate(config.mediatorClass);
+					mediator.context = this.context;
 					for(var clazz_key_a in config.typedViewClasses)
 					{
 						var clazz:any = config.typedViewClasses[clazz_key_a];

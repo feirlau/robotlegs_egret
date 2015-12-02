@@ -1,8 +1,5 @@
 module fl {
 	export class Mediator extends fl.MediatorBase {
-
-		public contextView:egret.DisplayObjectContainer;
-		public mediatorMap:fl.IMediatorMap;
 		protected _eventDispatcher:egret.IEventDispatcher;
 		protected _eventMap:fl.IEventMap;
 
@@ -11,6 +8,13 @@ module fl {
 			super();
 		}
 
+		protected updateContext()
+		{
+			super.updateContext();
+			
+			this._eventDispatcher = this.context.eventDispatcher;
+		}
+		
 		public preRemove()
 		{
 			if(this._eventMap)
@@ -62,7 +66,7 @@ module fl {
 
 		protected removeContextListener(type:string,listener:Function,eventClass:any = null,useCapture:boolean = false)
 		{
-			this.eventMap["unmapListener"](this.eventDispatcher,type,listener,eventClass,useCapture);
+			this.eventMap.unmapListener(this.eventDispatcher,type,listener,eventClass,useCapture);
 		}
 
 	}
