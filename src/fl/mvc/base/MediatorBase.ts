@@ -1,6 +1,6 @@
 module fl {
 	export class MediatorBase extends egret.HashObject implements fl.IMediator {
-		public static  UIComponentClass:string;
+		public static  UIComponentClass:string = "eui.UIComponent";
 		protected viewComponent:any;
 		protected removed:boolean = false;
 		protected _context:fl.IContext;
@@ -26,7 +26,7 @@ module fl {
 		public preRegister()
 		{
 			this.removed = false;
-			if(fl.is(this.viewComponent, fl.MediatorBase.UIComponentClass) && !this.viewComponent["$UIComponent"][29/* initialized */])
+			if(fl.is(this.viewComponent, fl.MediatorBase.UIComponentClass) && !fl.isComponentInited(this.viewComponent))
 			{
 				(<egret.IEventDispatcher>(this.viewComponent)).addEventListener("creationComplete", this.onCreationComplete,this,false,0);
 			}
@@ -69,5 +69,3 @@ module fl {
 
 	}
 }
-
-fl.MediatorBase.UIComponentClass = 'eui.UIComponent';

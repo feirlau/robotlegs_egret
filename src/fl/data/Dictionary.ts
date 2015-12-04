@@ -31,13 +31,16 @@ module fl {
             return val;
         }
 
-        public delItem(key) {
+        public delItem(key):any {
+            var item:any;
             for (var i = 0; i < this.map.length; i++) {
                 if (this.map[i][0] == key) {
+                    item = this.map[i][1];
                     this.map.splice(i, 1);
                     break;
                 }
             }
+            return item;
         }
 
         public hasOwnProperty(key) {

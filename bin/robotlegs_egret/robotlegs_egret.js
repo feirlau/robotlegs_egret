@@ -4,6 +4,15 @@
  */
 var fl;
 (function (fl) {
+    /**event: eui.UIEvent.CREATION_COMPLETE = "creationComplete" */
+    function isComponentInited(comp) {
+        var b = true;
+        if (comp && ("$UIComponent" in comp)) {
+            b = comp["$UIComponent"][29 /* initialized */];
+        }
+        return b;
+    }
+    fl.isComponentInited = isComponentInited;
     function isNumber(value) {
         var type = (typeof value);
         if (type === "object") {
@@ -353,12 +362,15 @@ var fl;
             return val;
         };
         p.delItem = function (key) {
+            var item;
             for (var i = 0; i < this.map.length; i++) {
                 if (this.map[i][0] == key) {
+                    item = this.map[i][1];
                     this.map.splice(i, 1);
                     break;
                 }
             }
+            return item;
         };
         p.hasOwnProperty = function (key) {
             if (this.map == undefined || this.map.length == undefined) {
@@ -723,6 +735,7 @@ var fl;
     egret.registerClass(InjectionPoint,"fl.InjectionPoint");
 })(fl || (fl = {}));
 
+/// <reference path="InjectionPoint" />
 var fl;
 (function (fl) {
     var NoParamsConstructorInjectionPoint = (function (_super) {
@@ -757,6 +770,7 @@ var fl;
     egret.registerClass(InjectionResult,"fl.InjectionResult");
 })(fl || (fl = {}));
 
+/// <reference path="InjectionResult" />
 var fl;
 (function (fl) {
     var InjectClassResult = (function (_super) {
@@ -775,6 +789,7 @@ var fl;
     egret.registerClass(InjectClassResult,"fl.InjectClassResult");
 })(fl || (fl = {}));
 
+/// <reference path="InjectionResult" />
 var fl;
 (function (fl) {
     var InjectOtherRuleResult = (function (_super) {
@@ -793,6 +808,7 @@ var fl;
     egret.registerClass(InjectOtherRuleResult,"fl.InjectOtherRuleResult");
 })(fl || (fl = {}));
 
+/// <reference path="InjectionResult" />
 var fl;
 (function (fl) {
     var InjectSingletonResult = (function (_super) {
@@ -814,6 +830,7 @@ var fl;
     egret.registerClass(InjectSingletonResult,"fl.InjectSingletonResult");
 })(fl || (fl = {}));
 
+/// <reference path="InjectionResult" />
 var fl;
 (function (fl) {
     var InjectValueResult = (function (_super) {
@@ -1206,7 +1223,7 @@ var fl;
         };
         p.preRegister = function () {
             this.removed = false;
-            if (fl.is(this.viewComponent, fl.MediatorBase.UIComponentClass) && !this.viewComponent["$UIComponent"][29 /* initialized */]) {
+            if (fl.is(this.viewComponent, fl.MediatorBase.UIComponentClass) && !fl.isComponentInited(this.viewComponent)) {
                 (this.viewComponent).addEventListener("creationComplete", this.onCreationComplete, this, false, 0);
             }
             else {
@@ -1232,13 +1249,67 @@ var fl;
             if (!this.removed)
                 this.onRegister();
         };
+        MediatorBase.UIComponentClass = "eui.UIComponent";
         return MediatorBase;
     })(egret.HashObject);
     fl.MediatorBase = MediatorBase;
     egret.registerClass(MediatorBase,"fl.MediatorBase",["fl.IMediator"]);
 })(fl || (fl = {}));
-fl.MediatorBase.UIComponentClass = 'eui.UIComponent';
 
+var fl;
+(function (fl) {
+    var ViewMapBase = (function (_super) {
+        __extends(ViewMapBase, _super);
+        function ViewMapBase(context) {
+            _super.call(this);
+            this._enabled = true;
+            this.useCapture = false;
+            this.viewListenerCount = 0;
+            this.context = context;
+            this.injector = context.injector;
+            this.useCapture = true;
+            this.contextView = context.contextView;
+        }
+        var d = __define,c=ViewMapBase;p=c.prototype;
+        d(p, "contextView"
+            ,function () {
+                return this._contextView;
+            }
+            ,function (value) {
+                if (value != this._contextView) {
+                    this.removeListeners();
+                    this._contextView = value;
+                    if (this.viewListenerCount > 0)
+                        this.addListeners();
+                }
+            }
+        );
+        d(p, "enabled"
+            ,function () {
+                return this._enabled;
+            }
+            ,function (value) {
+                if (value != this._enabled) {
+                    this.removeListeners();
+                    this._enabled = value;
+                    if (this.viewListenerCount > 0)
+                        this.addListeners();
+                }
+            }
+        );
+        p.addListeners = function () {
+        };
+        p.removeListeners = function () {
+        };
+        p.onViewAdded = function (e) {
+        };
+        return ViewMapBase;
+    })(egret.HashObject);
+    fl.ViewMapBase = ViewMapBase;
+    egret.registerClass(ViewMapBase,"fl.ViewMapBase");
+})(fl || (fl = {}));
+
+/// <reference path="ViewMapBase" />
 var fl;
 (function (fl) {
     var MediatorMap = (function (_super) {
@@ -1426,6 +1497,7 @@ var fl;
     egret.registerClass(MappingConfig,"fl.MappingConfig");
 })(fl || (fl = {}));
 
+/// <reference path="ViewMapBase" />
 var fl;
 (function (fl) {
     var ViewMap = (function (_super) {
@@ -1518,59 +1590,6 @@ var fl;
     })(fl.ViewMapBase);
     fl.ViewMap = ViewMap;
     egret.registerClass(ViewMap,"fl.ViewMap",["fl.IViewMap"]);
-})(fl || (fl = {}));
-
-var fl;
-(function (fl) {
-    var ViewMapBase = (function (_super) {
-        __extends(ViewMapBase, _super);
-        function ViewMapBase(context) {
-            _super.call(this);
-            this._enabled = true;
-            this.useCapture = false;
-            this.viewListenerCount = 0;
-            this.context = context;
-            this.injector = context.injector;
-            this.useCapture = true;
-            this.contextView = context.contextView;
-        }
-        var d = __define,c=ViewMapBase;p=c.prototype;
-        d(p, "contextView"
-            ,function () {
-                return this._contextView;
-            }
-            ,function (value) {
-                if (value != this._contextView) {
-                    this.removeListeners();
-                    this._contextView = value;
-                    if (this.viewListenerCount > 0)
-                        this.addListeners();
-                }
-            }
-        );
-        d(p, "enabled"
-            ,function () {
-                return this._enabled;
-            }
-            ,function (value) {
-                if (value != this._enabled) {
-                    this.removeListeners();
-                    this._enabled = value;
-                    if (this.viewListenerCount > 0)
-                        this.addListeners();
-                }
-            }
-        );
-        p.addListeners = function () {
-        };
-        p.removeListeners = function () {
-        };
-        p.onViewAdded = function (e) {
-        };
-        return ViewMapBase;
-    })(egret.HashObject);
-    fl.ViewMapBase = ViewMapBase;
-    egret.registerClass(ViewMapBase,"fl.ViewMapBase");
 })(fl || (fl = {}));
 
 var fl;

@@ -1,3 +1,5 @@
+/// <reference path="ViewMapBase" />
+
 module fl {
 	export class MediatorMap extends fl.ViewMapBase implements fl.IMediatorMap {
 

@@ -4,6 +4,8 @@ declare module fl {
  * Created by feir on 2015/11/14.
  */
 declare module fl {
+    /**event: eui.UIEvent.CREATION_COMPLETE = "creationComplete" */
+    function isComponentInited(comp: any): boolean;
     function isNumber(value: any): boolean;
     function isString(value: any): boolean;
     function isArray(value: any): boolean;
@@ -48,7 +50,7 @@ declare module fl {
         constructor(weak?: boolean);
         getItem(key: any, val?: any): any;
         setItem(key: any, val: any): any;
-        delItem(key: any): void;
+        delItem(key: any): any;
         hasOwnProperty(key: any): boolean;
     }
 }

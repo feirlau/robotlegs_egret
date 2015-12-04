@@ -1,3 +1,5 @@
+/// <reference path="InjectionResult" />
+
 module fl {
 	export class InjectSingletonResult extends fl.InjectionResult {
 

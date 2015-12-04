@@ -1,3 +1,5 @@
+/// <reference path="InjectionResult" />
+
 module fl {
 	export class InjectValueResult extends fl.InjectionResult {
 

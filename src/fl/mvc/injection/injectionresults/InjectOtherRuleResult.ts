@@ -1,3 +1,5 @@
+/// <reference path="InjectionResult" />
+
 module fl {
 	export class InjectOtherRuleResult extends fl.InjectionResult {
 

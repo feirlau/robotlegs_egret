@@ -2,6 +2,14 @@
  * Created by feir on 2015/11/14.
  */
 module fl {
+    /**event: eui.UIEvent.CREATION_COMPLETE = "creationComplete" */
+    export function isComponentInited(comp:any):boolean {
+        var b:boolean = true;
+        if(comp && ("$UIComponent" in comp)) {
+            b = comp["$UIComponent"][29/* initialized */];
+        }
+        return b;
+    }
     export function isNumber(value:any):boolean {
         var type:string = (typeof value);
         if(type === "object") {

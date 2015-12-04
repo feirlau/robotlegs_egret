@@ -1,3 +1,5 @@
+/// <reference path="ViewMapBase" />
+
 module fl {
 	export class ViewMap extends fl.ViewMapBase implements fl.IViewMap {
 
