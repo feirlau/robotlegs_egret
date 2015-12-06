@@ -4,15 +4,79 @@
  */
 var fl;
 (function (fl) {
+    fl.P_$UIComponent = "$UIComponent";
     /**event: eui.UIEvent.CREATION_COMPLETE = "creationComplete" */
     function isComponentInited(comp) {
         var b = true;
-        if (comp && ("$UIComponent" in comp)) {
-            b = comp["$UIComponent"][29 /* initialized */];
+        if (comp && (fl.P_$UIComponent in comp)) {
+            b = comp[fl.P_$UIComponent][29 /* initialized */];
         }
         return b;
     }
     fl.isComponentInited = isComponentInited;
+    //hook contextView
+    fl.P_$fl$contextView = "$fl$contextView";
+    function injectContextView(comp, contextView) {
+        if (isString(comp))
+            comp = egret.getDefinitionByName(comp);
+        if (comp)
+            comp[fl.P_$fl$contextView] = contextView;
+    }
+    fl.injectContextView = injectContextView;
+    function uninjectContextView(comp) {
+        if (isString(comp))
+            comp = egret.getDefinitionByName(comp);
+        if (comp)
+            comp[fl.P_$fl$contextView] = null;
+    }
+    fl.uninjectContextView = uninjectContextView;
+    function getContextView(comp) {
+        var cv;
+        if (isObject(comp)) {
+            cv = comp[fl.P_$fl$contextView];
+            if (cv) {
+                return cv;
+            }
+            comp = comp.constructor;
+        }
+        if (isClass(comp)) {
+            cv = comp[fl.P_$fl$contextView];
+        }
+        return cv;
+    }
+    fl.getContextView = getContextView;
+    /** hook egret.DisplayObject to dispatch egret.Event.ADDED_TO_STAGE to contextView */
+    function hookContextView(comp) {
+        var p = comp.prototype;
+        Object.defineProperty(p, "initialized", { configurable: true, enumerable: true, get: function () {
+                return fl.isComponentInited(this);
+            } });
+        var contextView;
+        var e;
+        var f1 = p.$onAddToStage;
+        p.$onAddToStage = function (stage, nestLevel) {
+            f1.apply(this, arguments);
+            contextView = getContextView(this);
+            if (contextView) {
+                e = egret.Event.create(egret.Event, egret.Event.ADDED_TO_STAGE);
+                e.$setTarget(this);
+                e.$currentTarget = contextView;
+                contextView.$notifyListener(e, true);
+            }
+        };
+        var f2 = p.$onRemoveFromStage;
+        p.$onRemoveFromStage = function () {
+            f2.apply(this, arguments);
+            contextView = getContextView(this);
+            if (contextView) {
+                e = egret.Event.create(egret.Event, egret.Event.REMOVED_FROM_STAGE);
+                e.$setTarget(this);
+                e.$currentTarget = contextView;
+                contextView.$notifyListener(e, true);
+            }
+        };
+    }
+    fl.hookContextView = hookContextView;
     function isNumber(value) {
         var type = (typeof value);
         if (type === "object") {
@@ -314,6 +378,8 @@ var fl;
 fl.LINE_BREAKS = new RegExp("[\r\n]+", "img");
 fl.COLOR_TEXT = "\<font {0} {1} {2}\>{3}\</font\>";
 fl.HTML_TAG = /<[^>]+>/g;
+//hooks
+fl.hookContextView(egret.DisplayObject);
 
 var fl;
 (function (fl) {
@@ -1005,7 +1071,7 @@ var fl;
         };
         d(p, "commandMap"
             ,function () {
-                return this._commandMap;
+                return this._commandMap = this._commandMap || new fl.CommandMap(this);
             }
             ,function (value) {
                 this._commandMap = value;
@@ -1013,7 +1079,7 @@ var fl;
         );
         d(p, "mediatorMap"
             ,function () {
-                return this._mediatorMap;
+                return this._mediatorMap = this._mediatorMap || new fl.MediatorMap(this);
             }
             ,function (value) {
                 this._mediatorMap = value;
@@ -1021,7 +1087,7 @@ var fl;
         );
         d(p, "viewMap"
             ,function () {
-                return this._viewMap;
+                return this._viewMap = this._viewMap || new fl.ViewMap(this);
             }
             ,function (value) {
                 this._viewMap = value;
@@ -1348,6 +1414,7 @@ var fl;
             else if (viewClassOrName && !fl.isString(viewClassOrName)) {
                 config.typedViewClasses = [viewClassOrName];
             }
+            fl.injectContextView(viewClassName, this.contextView);
             this.mappingConfigByViewClassName.setItem(viewClassName, config);
             if (autoCreate || autoRemove) {
                 this.viewListenerCount++;
@@ -1359,6 +1426,7 @@ var fl;
         };
         p.unmapView = function (viewClassOrName) {
             var viewClassName = this.reflector.getFQCN(viewClassOrName);
+            fl.uninjectContextView(viewClassName);
             var config = this.mappingConfigByViewClassName.getItem(viewClassName);
             if (config && (config.autoCreate || config.autoRemove)) {
                 this.viewListenerCount--;
@@ -1657,12 +1725,8 @@ var fl;
             if (autoStartup === void 0) { autoStartup = true; }
             _super.call(this);
             this._autoStartup = false;
-            this._contextView = contextView;
             this._autoStartup = autoStartup;
-            if (this._contextView) {
-                this.mapInjections();
-                this.checkAutoStartup();
-            }
+            this.contextView = contextView;
         }
         var d = __define,c=Context;p=c.prototype;
         p.startup = function () {
@@ -1671,7 +1735,10 @@ var fl;
         p.shutdown = function () {
             this.dispatchEvent(new fl.ContextEvent(fl.ContextEvent.SHUTDOWN_COMPLETE));
         };
-        d(p, "contextView",undefined
+        d(p, "contextView"
+            ,function () {
+                return this._contextView;
+            }
             ,function (value) {
                 if (value == this._contextView)
                     return;
@@ -1680,21 +1747,6 @@ var fl;
                 this._contextView = value;
                 this.mapInjections();
                 this.checkAutoStartup();
-            }
-        );
-        d(p, "commandMap"
-            ,function () {
-                return this._commandMap = this._commandMap || new fl.CommandMap(this);
-            }
-        );
-        d(p, "mediatorMap"
-            ,function () {
-                return this._mediatorMap = this._mediatorMap || new fl.MediatorMap(this);
-            }
-        );
-        d(p, "viewMap"
-            ,function () {
-                return this._viewMap = this._viewMap || new fl.ViewMap(this);
             }
         );
         p.mapInjections = function () {

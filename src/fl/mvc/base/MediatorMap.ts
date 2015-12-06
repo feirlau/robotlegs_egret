@@ -46,6 +46,7 @@ module fl {
 			{
 				config.typedViewClasses = [viewClassOrName];
 			}
+			fl.injectContextView(viewClassName, this.contextView);
 			this.mappingConfigByViewClassName.setItem(viewClassName,config);
 			if(autoCreate || autoRemove)
 			{
@@ -60,6 +61,7 @@ module fl {
 		public unmapView(viewClassOrName:any)
 		{
 			var viewClassName:string = this.reflector.getFQCN(viewClassOrName);
+			fl.uninjectContextView(viewClassName);
 			var config:MappingConfig = this.mappingConfigByViewClassName.getItem(viewClassName);
 			if(config && (config.autoCreate || config.autoRemove))
 			{

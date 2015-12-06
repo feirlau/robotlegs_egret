@@ -2,14 +2,75 @@
  * Created by feir on 2015/11/14.
  */
 module fl {
+    export var P_$UIComponent:string = "$UIComponent";
     /**event: eui.UIEvent.CREATION_COMPLETE = "creationComplete" */
     export function isComponentInited(comp:any):boolean {
         var b:boolean = true;
-        if(comp && ("$UIComponent" in comp)) {
-            b = comp["$UIComponent"][29/* initialized */];
+        if(comp && (P_$UIComponent in comp)) {
+            b = comp[P_$UIComponent][29/* initialized */];
         }
         return b;
     }
+    
+    //hook contextView
+    export var P_$fl$contextView:string = "$fl$contextView";
+    export function injectContextView(comp:any, contextView:any):void {
+        if(isString(comp)) comp = egret.getDefinitionByName(comp);
+        
+        if(comp) comp[P_$fl$contextView] = contextView;
+    }
+    export function uninjectContextView(comp:any):void {
+        if(isString(comp)) comp = egret.getDefinitionByName(comp);
+        
+        if(comp) comp[P_$fl$contextView] = null;
+    }
+    
+    export function getContextView(comp:any):any {
+        var cv:any;
+        if(isObject(comp)) {
+            cv = comp[P_$fl$contextView];
+            if(cv) {
+                return cv;
+            }
+            comp = comp.constructor;
+        }
+        if(isClass(comp)) {
+            cv = comp[P_$fl$contextView];
+        }
+        return cv;
+    }
+    /** hook egret.DisplayObject to dispatch egret.Event.ADDED_TO_STAGE to contextView */
+    export function hookContextView(comp:any):void {
+        var p:any = comp.prototype;
+        Object.defineProperty(p, "initialized", { configurable: true, enumerable: true, get: function() {
+            return fl.isComponentInited(this);
+        }});
+        var contextView:any;
+        var e:egret.Event;
+        var f1:Function = p.$onAddToStage;
+        p.$onAddToStage = function(stage:egret.Stage, nestLevel:number):void {
+            f1.apply(this, arguments);
+            contextView = getContextView(this);
+            if(contextView) {
+                e = egret.Event.create(egret.Event, egret.Event.ADDED_TO_STAGE);
+                e.$setTarget(this);
+                e.$currentTarget = contextView;
+                contextView.$notifyListener(e, true);
+            }
+        };
+        var f2:Function = p.$onRemoveFromStage;
+        p.$onRemoveFromStage = function():void {
+            f2.apply(this, arguments);
+            contextView = getContextView(this);
+            if(contextView) {
+                e = egret.Event.create(egret.Event, egret.Event.REMOVED_FROM_STAGE);
+                e.$setTarget(this);
+                e.$currentTarget = contextView;
+                contextView.$notifyListener(e, true);
+            }
+        };
+    }
+    
     export function isNumber(value:any):boolean {
         var type:string = (typeof value);
         if(type === "object") {
@@ -337,3 +398,8 @@ module fl {
 fl.LINE_BREAKS = new RegExp("[\r\n]+","img");
 fl.COLOR_TEXT = "\<font {0} {1} {2}\>{3}\</font\>";
 fl.HTML_TAG = /<[^>]+>/g;
+
+//hooks
+fl.hookContextView(egret.DisplayObject);
+
+

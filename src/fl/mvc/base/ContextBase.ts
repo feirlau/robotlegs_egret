@@ -55,7 +55,7 @@ module fl {
 		
 		public get commandMap():fl.ICommandMap
 		{
-			return this._commandMap;
+			return this._commandMap = this._commandMap || new fl.CommandMap(this);
 		}
 
 		public set commandMap(value:fl.ICommandMap)
@@ -65,7 +65,7 @@ module fl {
 
 		public get mediatorMap():fl.IMediatorMap
 		{
-			return this._mediatorMap;
+			return this._mediatorMap = this._mediatorMap || new fl.MediatorMap(this);
 		}
 
 		public set mediatorMap(value:fl.IMediatorMap)
@@ -75,7 +75,7 @@ module fl {
 
 		public get viewMap():fl.IViewMap
 		{
-			return this._viewMap;
+			return this._viewMap = this._viewMap || new ViewMap(this);
 		}
 
 		public set viewMap(value:fl.IViewMap)
