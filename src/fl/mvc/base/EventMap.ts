@@ -22,7 +22,7 @@ module fl {
 			this._dispatcherListeningEnabled = value;
 		}
 
-		public mapListener(dispatcher:egret.IEventDispatcher,type:string,listener:Function,eventClass:any = null,useCapture:boolean = false,priority:number = 0)
+		public mapListener(dispatcher:egret.IEventDispatcher,type:string,listener:Function,thisObject:any,eventClass:any = null,useCapture:boolean = false,priority:number = 0)
 		{
 			var _self__:any = this;
 			if(this.dispatcherListeningEnabled == false && dispatcher == this.eventDispatcher)
@@ -35,21 +35,21 @@ module fl {
 			while(i--)
 			{
 				params = this.listeners[i];
-				if(params["dispatcher"] == dispatcher && params["type"] == type && params["listener"] == listener && params["useCapture"] == useCapture && params["eventClass"] == eventClass)
+				if(params["dispatcher"] == dispatcher && params["type"] == type && params["listener"] == listener && params["thisObject"] == thisObject && params["useCapture"] == useCapture && params["eventClass"] == eventClass)
 				{
 					return ;
 				}
 			}
 			var callback:Function = <any>function (event:egret.Event)
 			{
-				_self__.routeEventToListener(event,listener,eventClass);
+				_self__.routeEventToListener(event,listener,thisObject,eventClass);
 			};
-			params = {dispatcher:dispatcher,type:type,listener:listener,eventClass:eventClass,callback:callback,useCapture:useCapture};
+			params = {dispatcher:dispatcher,type:type,listener:listener,thisObject:thisObject,eventClass:eventClass,callback:callback,useCapture:useCapture};
 			this.listeners.push(params);
-			dispatcher.addEventListener(type,callback,null,useCapture,priority);
+			dispatcher.addEventListener(type,callback,thisObject,useCapture,priority);
 		}
 
-		public unmapListener(dispatcher:egret.IEventDispatcher,type:string,listener:Function,eventClass:any = null,useCapture:boolean = false)
+		public unmapListener(dispatcher:egret.IEventDispatcher,type:string,listener:Function,thisObject:any,eventClass:any = null,useCapture:boolean = false)
 		{
 			eventClass = eventClass || egret.Event;
 			var params:any;
@@ -57,9 +57,9 @@ module fl {
 			while(i--)
 			{
 				params = this.listeners[i];
-				if(params["dispatcher"] == dispatcher && params["type"] == type && params["listener"] == listener && params["useCapture"] == useCapture && params["eventClass"] == eventClass)
+				if(params["dispatcher"] == dispatcher && params["type"] == type && params["listener"] == listener && params["thisObject"] == thisObject && params["useCapture"] == useCapture && params["eventClass"] == eventClass)
 				{
-					dispatcher.removeEventListener(type,params["callback"],null,useCapture);
+					dispatcher.removeEventListener(type,params["callback"],params["thisObject"],useCapture);
 					this.listeners.splice(i,1);
 					return ;
 				}
@@ -73,15 +73,15 @@ module fl {
 			while(params = this.listeners.pop())
 			{
 				dispatcher = params["dispatcher"];
-				dispatcher.removeEventListener(params["type"],params["callback"],null,params["useCapture"]);
+				dispatcher.removeEventListener(params["type"],params["callback"],params["thisObject"],params["useCapture"]);
 			}
 		}
 
-		protected routeEventToListener(event:egret.Event,listener:Function,originalEventClass:any)
+		protected routeEventToListener(event:egret.Event,listener:Function,thisObject:any,originalEventClass:any)
 		{
 			if(fl.is(event, originalEventClass))
 			{
-				listener(event);
+				listener.call(thisObject, event);
 			}
 		}
 

@@ -1209,7 +1209,7 @@ var fl;
                 this._dispatcherListeningEnabled = value;
             }
         );
-        p.mapListener = function (dispatcher, type, listener, eventClass, useCapture, priority) {
+        p.mapListener = function (dispatcher, type, listener, thisObject, eventClass, useCapture, priority) {
             if (eventClass === void 0) { eventClass = null; }
             if (useCapture === void 0) { useCapture = false; }
             if (priority === void 0) { priority = 0; }
@@ -1222,18 +1222,18 @@ var fl;
             var i = this.listeners.length;
             while (i--) {
                 params = this.listeners[i];
-                if (params["dispatcher"] == dispatcher && params["type"] == type && params["listener"] == listener && params["useCapture"] == useCapture && params["eventClass"] == eventClass) {
+                if (params["dispatcher"] == dispatcher && params["type"] == type && params["listener"] == listener && params["thisObject"] == thisObject && params["useCapture"] == useCapture && params["eventClass"] == eventClass) {
                     return;
                 }
             }
             var callback = function (event) {
-                _self__.routeEventToListener(event, listener, eventClass);
+                _self__.routeEventToListener(event, listener, thisObject, eventClass);
             };
-            params = { dispatcher: dispatcher, type: type, listener: listener, eventClass: eventClass, callback: callback, useCapture: useCapture };
+            params = { dispatcher: dispatcher, type: type, listener: listener, thisObject: thisObject, eventClass: eventClass, callback: callback, useCapture: useCapture };
             this.listeners.push(params);
-            dispatcher.addEventListener(type, callback, null, useCapture, priority);
+            dispatcher.addEventListener(type, callback, thisObject, useCapture, priority);
         };
-        p.unmapListener = function (dispatcher, type, listener, eventClass, useCapture) {
+        p.unmapListener = function (dispatcher, type, listener, thisObject, eventClass, useCapture) {
             if (eventClass === void 0) { eventClass = null; }
             if (useCapture === void 0) { useCapture = false; }
             eventClass = eventClass || egret.Event;
@@ -1241,8 +1241,8 @@ var fl;
             var i = this.listeners.length;
             while (i--) {
                 params = this.listeners[i];
-                if (params["dispatcher"] == dispatcher && params["type"] == type && params["listener"] == listener && params["useCapture"] == useCapture && params["eventClass"] == eventClass) {
-                    dispatcher.removeEventListener(type, params["callback"], null, useCapture);
+                if (params["dispatcher"] == dispatcher && params["type"] == type && params["listener"] == listener && params["thisObject"] == thisObject && params["useCapture"] == useCapture && params["eventClass"] == eventClass) {
+                    dispatcher.removeEventListener(type, params["callback"], params["thisObject"], useCapture);
                     this.listeners.splice(i, 1);
                     return;
                 }
@@ -1253,12 +1253,12 @@ var fl;
             var dispatcher;
             while (params = this.listeners.pop()) {
                 dispatcher = params["dispatcher"];
-                dispatcher.removeEventListener(params["type"], params["callback"], null, params["useCapture"]);
+                dispatcher.removeEventListener(params["type"], params["callback"], params["thisObject"], params["useCapture"]);
             }
         };
-        p.routeEventToListener = function (event, listener, originalEventClass) {
+        p.routeEventToListener = function (event, listener, thisObject, originalEventClass) {
             if (fl.is(event, originalEventClass)) {
-                listener(event);
+                listener.call(thisObject, event);
             }
         };
         return EventMap;
@@ -1820,27 +1820,27 @@ var fl;
                 return this.eventDispatcher.dispatchEvent(event);
             return false;
         };
-        p.addViewListener = function (type, listener, eventClass, useCapture, priority) {
+        p.addViewListener = function (type, listener, thisObject, eventClass, useCapture, priority) {
             if (eventClass === void 0) { eventClass = null; }
             if (useCapture === void 0) { useCapture = false; }
             if (priority === void 0) { priority = 0; }
-            this.eventMap.mapListener(this.viewComponent, type, listener, eventClass, useCapture, priority);
+            this.eventMap.mapListener(this.viewComponent, type, listener, thisObject, eventClass, useCapture, priority);
         };
-        p.removeViewListener = function (type, listener, eventClass, useCapture) {
+        p.removeViewListener = function (type, listener, thisObject, eventClass, useCapture) {
             if (eventClass === void 0) { eventClass = null; }
             if (useCapture === void 0) { useCapture = false; }
-            this.eventMap.unmapListener(this.viewComponent, type, listener, eventClass, useCapture);
+            this.eventMap.unmapListener(this.viewComponent, type, listener, thisObject, eventClass, useCapture);
         };
-        p.addContextListener = function (type, listener, eventClass, useCapture, priority) {
+        p.addContextListener = function (type, listener, thisObject, eventClass, useCapture, priority) {
             if (eventClass === void 0) { eventClass = null; }
             if (useCapture === void 0) { useCapture = false; }
             if (priority === void 0) { priority = 0; }
-            this.eventMap.mapListener(this.eventDispatcher, type, listener, eventClass, useCapture, priority);
+            this.eventMap.mapListener(this.eventDispatcher, type, listener, thisObject, eventClass, useCapture, priority);
         };
-        p.removeContextListener = function (type, listener, eventClass, useCapture) {
+        p.removeContextListener = function (type, listener, thisObject, eventClass, useCapture) {
             if (eventClass === void 0) { eventClass = null; }
             if (useCapture === void 0) { useCapture = false; }
-            this.eventMap.unmapListener(this.eventDispatcher, type, listener, eventClass, useCapture);
+            this.eventMap.unmapListener(this.eventDispatcher, type, listener, thisObject, eventClass, useCapture);
         };
         return Mediator;
     })(fl.MediatorBase);

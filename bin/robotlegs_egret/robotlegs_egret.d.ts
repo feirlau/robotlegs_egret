@@ -95,8 +95,8 @@ declare module fl {
 }
 declare module fl {
     interface IEventMap {
-        mapListener(dispatcher: egret.IEventDispatcher, type: string, listener: Function, eventClass?: any, useCapture?: boolean, priority?: number): any;
-        unmapListener(dispatcher: egret.IEventDispatcher, type: string, listener: Function, eventClass?: any, useCapture?: boolean): any;
+        mapListener(dispatcher: egret.IEventDispatcher, type: string, listener: Function, thisObject: any, eventClass?: any, useCapture?: boolean, priority?: number): any;
+        unmapListener(dispatcher: egret.IEventDispatcher, type: string, listener: Function, thisObject: any, eventClass?: any, useCapture?: boolean): any;
         unmapListeners(): any;
     }
     var IEventMap: string;
@@ -364,10 +364,10 @@ declare module fl {
         protected listeners: Array<any>;
         constructor(eventDispatcher: egret.IEventDispatcher);
         dispatcherListeningEnabled: boolean;
-        mapListener(dispatcher: egret.IEventDispatcher, type: string, listener: Function, eventClass?: any, useCapture?: boolean, priority?: number): void;
-        unmapListener(dispatcher: egret.IEventDispatcher, type: string, listener: Function, eventClass?: any, useCapture?: boolean): void;
+        mapListener(dispatcher: egret.IEventDispatcher, type: string, listener: Function, thisObject: any, eventClass?: any, useCapture?: boolean, priority?: number): void;
+        unmapListener(dispatcher: egret.IEventDispatcher, type: string, listener: Function, thisObject: any, eventClass?: any, useCapture?: boolean): void;
         unmapListeners(): void;
-        protected routeEventToListener(event: egret.Event, listener: Function, originalEventClass: any): void;
+        protected routeEventToListener(event: egret.Event, listener: Function, thisObject: any, originalEventClass: any): void;
     }
 }
 declare module fl {
@@ -498,9 +498,9 @@ declare module fl {
         eventDispatcher: egret.IEventDispatcher;
         protected eventMap: fl.IEventMap;
         protected dispatch(event: egret.Event): boolean;
-        protected addViewListener(type: string, listener: Function, eventClass?: any, useCapture?: boolean, priority?: number): void;
-        protected removeViewListener(type: string, listener: Function, eventClass?: any, useCapture?: boolean): void;
-        protected addContextListener(type: string, listener: Function, eventClass?: any, useCapture?: boolean, priority?: number): void;
-        protected removeContextListener(type: string, listener: Function, eventClass?: any, useCapture?: boolean): void;
+        protected addViewListener(type: string, listener: Function, thisObject: any, eventClass?: any, useCapture?: boolean, priority?: number): void;
+        protected removeViewListener(type: string, listener: Function, thisObject: any, eventClass?: any, useCapture?: boolean): void;
+        protected addContextListener(type: string, listener: Function, thisObject: any, eventClass?: any, useCapture?: boolean, priority?: number): void;
+        protected removeContextListener(type: string, listener: Function, thisObject: any, eventClass?: any, useCapture?: boolean): void;
     }
 }

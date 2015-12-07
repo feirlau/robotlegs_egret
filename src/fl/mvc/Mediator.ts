@@ -49,24 +49,24 @@ module fl {
 			return false;
 		}
 
-		protected addViewListener(type:string,listener:Function,eventClass:any = null,useCapture:boolean = false,priority:number = 0)
+		protected addViewListener(type:string,listener:Function,thisObject:any,eventClass:any = null,useCapture:boolean = false,priority:number = 0)
 		{
-			this.eventMap.mapListener(this.viewComponent,type,listener,eventClass,useCapture,priority);
+			this.eventMap.mapListener(this.viewComponent,type,listener,thisObject,eventClass,useCapture,priority);
 		}
 
-		protected removeViewListener(type:string,listener:Function,eventClass:any = null,useCapture:boolean = false)
+		protected removeViewListener(type:string,listener:Function,thisObject:any,eventClass:any = null,useCapture:boolean = false)
 		{
-			this.eventMap.unmapListener(this.viewComponent,type,listener,eventClass,useCapture);
+			this.eventMap.unmapListener(this.viewComponent,type,listener,thisObject,eventClass,useCapture);
 		}
 
-		protected addContextListener(type:string,listener:Function,eventClass:any = null,useCapture:boolean = false,priority:number = 0)
+		protected addContextListener(type:string,listener:Function,thisObject:any,eventClass:any = null,useCapture:boolean = false,priority:number = 0)
 		{
-			this.eventMap.mapListener(this.eventDispatcher,type,listener,eventClass,useCapture,priority);
+			this.eventMap.mapListener(this.eventDispatcher,type,listener,thisObject,eventClass,useCapture,priority);
 		}
 
-		protected removeContextListener(type:string,listener:Function,eventClass:any = null,useCapture:boolean = false)
+		protected removeContextListener(type:string,listener:Function,thisObject:any,eventClass:any = null,useCapture:boolean = false)
 		{
-			this.eventMap.unmapListener(this.eventDispatcher,type,listener,eventClass,useCapture);
+			this.eventMap.unmapListener(this.eventDispatcher,type,listener,thisObject,eventClass,useCapture);
 		}
 
 	}
